@@ -6,7 +6,12 @@ type Props = {
 export const UserList = ({users} :Props) => {
   return (
    <div>
-    {users.map((user)=> <div key={user.username}>{user.username}</div>)}
+    <ul>
+      <li>
+      {users.map((user)=> <div key={user.username}>{user.username}</div>)}
+      </li>
+    </ul>
+    
    </div>
   );
 }

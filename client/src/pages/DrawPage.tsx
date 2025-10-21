@@ -3,13 +3,17 @@ import { AppHeader } from '../components/AppHeader/AppHeader'
 import { DrawLayout } from '../components/DrawLayout/DrawLayout'
 import { DrawSocket } from '../DrawSocket'
 import { useMyUserStore } from '../store/useMyUserStore'
+import { useUserListStore } from '../store/useAllUsers'
 import { createMyUser } from '../utils/create-my-user'
 import { Instructions } from '../components/Instructions/Instructions'
 import { getInstructions } from '../utils/get-instructions'
 import { UserList } from '../components/UserList/UserList'
+// import { ListList, ListItem, List } from 'semantic-ui-react'
 
 function DrawPage() {
   const setMyUser = useMyUserStore((state) => state.setMyUser)
+  const setUserList = useUserListStore((state) => state.setUserList)
+  const userList = useUserListStore((state) => state.userList); 
 
 
   const onClickJoin = () => {
@@ -30,7 +34,15 @@ function DrawPage() {
 
 
 
-// add set user list
+  useEffect(() => {
+    DrawSocket.listen("users:updated", (data)=>{
+      console.log("Users updated:", data);
+      setUserList(data.users);
+    }
+    )
+
+  }, [setUserList]);
+
     
 
 
@@ -48,11 +60,18 @@ function DrawPage() {
             {getInstructions('user-list')}
           </Instructions>
           {/* <!-- Ajouter le composant TestUserList ici --> */}
-          <UserList users={[
+          {/* <UserList users={[
             {username: 'Spider-man'},
             {username: 'toji'}
-          ]}/>
+          ]}/> */}
           {/* <TestUserList /> */}
+          {/* <List bulleted>
+            <ListItem><UserList users={userList} /></ListItem>
+          </List> */
+          
+          <UserList users={userList} />}
+
+  
         </>
       }
       bottomArea={
