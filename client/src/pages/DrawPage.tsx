@@ -8,6 +8,7 @@ import { createMyUser } from '../utils/create-my-user'
 import { Instructions } from '../components/Instructions/Instructions'
 import { getInstructions } from '../utils/get-instructions'
 import { UserList } from '../components/UserList/UserList'
+import { DrawArea } from '../components/DrawArea/DrawArea'
 // import { ListList, ListItem, List } from 'semantic-ui-react'
 
 function DrawPage() {
@@ -89,10 +90,10 @@ function DrawPage() {
         </>
       }
     >
-      <Instructions>
+      {/* <Instructions>
         {getInstructions('draw-area')}
-      </Instructions>
-      {/* <TestDrawArea /> */}
+      </Instructions> */}
+      <DrawArea/>
     </DrawLayout>
   )
 }

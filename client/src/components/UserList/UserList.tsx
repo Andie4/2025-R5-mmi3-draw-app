@@ -8,7 +8,7 @@ export const UserList = ({users} :Props) => {
    <div>
     <ul>
       <li>
-      {users.map((user)=> <div key={user.username}>{user.username}</div>)}
+        {users.map((user)=> <div key={user.username}>{user.username}</div>)}
       </li>
     </ul>
     
