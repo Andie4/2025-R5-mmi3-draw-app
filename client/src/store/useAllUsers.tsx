@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 
 type UserList = {
+  id : string;
   username: string;
 }[];
 

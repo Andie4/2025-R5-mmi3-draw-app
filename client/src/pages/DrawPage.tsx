@@ -38,9 +38,19 @@ function DrawPage() {
     DrawSocket.listen("users:updated", (data)=>{
       console.log("Users updated:", data);
       setUserList(data.users);
+    });
+    return () => {
+      DrawSocket.off("users:updated");
     }
-    )
 
+  }, [setUserList]);
+
+  useEffect(() => {
+    DrawSocket.get('users').then((data) => {
+      if (data){
+        setUserList(data.users);
+      }});
+      
   }, [setUserList]);
 
     
@@ -56,9 +66,6 @@ function DrawPage() {
       />}
       rightArea={
         <>
-          <Instructions>
-            {getInstructions('user-list')}
-          </Instructions>
           {/* <!-- Ajouter le composant TestUserList ici --> */}
           {/* <UserList users={[
             {username: 'Spider-man'},
