@@ -1,45 +1,28 @@
-import { useEffect } from 'react'
-import { AppHeader } from '../components/AppHeader/AppHeader'
-import { DrawLayout } from '../components/DrawLayout/DrawLayout'
-import { DrawSocket } from '../DrawSocket'
-import { useMyUserStore } from '../store/useMyUserStore'
-import { createMyUser } from '../utils/create-my-user'
-import { Instructions } from '../components/Instructions/Instructions'
-import { getInstructions } from '../utils/get-instructions'
+import { AppHeader } from '../shared/components/AppHeader/AppHeader'
+import { DrawLayout } from '../shared/components/layouts/DrawLayout/DrawLayout'
+
+import { Instructions } from '../shared/components/Instructions/Instructions'
+import { getInstructions } from '../shared/utils/get-instructions'
+import { UserList } from '../features/user/components/UserList'
+import { DrawArea } from '../features/drawing/components/DrawArea'
+import { useUpdatedUserList } from '../features/user/hooks/useUpdatedUserList'
+import { useJoinMyUser } from '../features/user/hooks/useJoinMyUser'
 
 function DrawPage() {
-  const setMyUser = useMyUserStore((state) => state.setMyUser)
-
-  const onClickJoin = () => {
-    DrawSocket.emit("myUser:join", createMyUser() );
-  }
-
-  useEffect(() => {
-    DrawSocket.listen("myUser:joined", (data) => {
-      setMyUser(data.user);
-
-      console.log("My User joined:success", data);
-    });
-    return () => {
-      DrawSocket.off("myUser:joined");
-    }
-  }, [setMyUser]);
-
-
+  const { joinMyUser }  = useJoinMyUser();
+  const { userList } = useUpdatedUserList();
 
   return (
     <DrawLayout
       topArea={<AppHeader 
-        onClickJoin={onClickJoin}
-        
+        onClickJoin={() => joinMyUser()}
       />}
       rightArea={
         <>
-          <Instructions>
+          {/* <Instructions>
             {getInstructions('user-list')}
-          </Instructions>
-          {/* <!-- Ajouter le composant TestUserList ici --> */}
-          {/* <TestUserList /> */}
+          </Instructions> */}
+          <UserList users={userList} />
         </>
       }
       bottomArea={
@@ -50,10 +33,12 @@ function DrawPage() {
         </>
       }
     >
-      <Instructions>
+      <DrawArea />
+      {/* <TestDrawArea /> */}
+      <Instructions className="max-w-xs">
         {getInstructions('draw-area')}
       </Instructions>
-      {/* <TestDrawArea /> */}
+      
     </DrawLayout>
   )
 }
