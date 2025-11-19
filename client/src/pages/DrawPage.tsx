@@ -1,16 +1,63 @@
-import { AppHeader } from '../shared/components/AppHeader/AppHeader'
-import { DrawLayout } from '../shared/components/layouts/DrawLayout/DrawLayout'
-
-import { Instructions } from '../shared/components/Instructions/Instructions'
-import { getInstructions } from '../shared/utils/get-instructions'
-import { UserList } from '../features/user/components/UserList'
-import { DrawArea } from '../features/drawing/components/DrawArea'
-import { useUpdatedUserList } from '../features/user/hooks/useUpdatedUserList'
-import { useJoinMyUser } from '../features/user/hooks/useJoinMyUser'
+import { use, useEffect } from 'react'
+import { AppHeader } from '../components/AppHeader/AppHeader'
+import { DrawLayout } from '../components/DrawLayout/DrawLayout'
+import { DrawSocket } from '../DrawSocket'
+import { useMyUserStore } from '../store/useMyUserStore'
+import { useUserListStore } from '../store/useAllUsers'
+import { createMyUser } from '../utils/create-my-user'
+import { Instructions } from '../components/Instructions/Instructions'
+import { getInstructions } from '../utils/get-instructions'
+import { UserList } from '../components/UserList/UserList'
+import { DrawArea } from '../components/DrawArea/DrawArea'
+// import { ListList, ListItem, List } from 'semantic-ui-react'
 
 function DrawPage() {
-  const { joinMyUser }  = useJoinMyUser();
-  const { userList } = useUpdatedUserList();
+  const setMyUser = useMyUserStore((state) => state.setMyUser)
+  const setUserList = useUserListStore((state) => state.setUserList)
+  const userList = useUserListStore((state) => state.userList); 
+
+
+  const onClickJoin = () => {
+    DrawSocket.emit("myUser:join", createMyUser() );
+  }
+
+  useEffect(() => {
+    DrawSocket.listen("myUser:joined", (data) => {
+      setMyUser(data.user);
+
+      console.log("My User joined:success", data );
+    });
+    return () => {
+      DrawSocket.off("myUser:joined");
+    }
+  }, [setMyUser]);
+
+
+
+
+  useEffect(() => {
+    DrawSocket.listen("users:updated", (data)=>{
+      console.log("Users updated:", data);
+      setUserList(data.users);
+    });
+    return () => {
+      DrawSocket.off("users:updated");
+    }
+
+  }, [setUserList]);
+
+  useEffect(() => {
+    DrawSocket.get('users').then((data) => {
+      if (data){
+        setUserList(data.users);
+      }});
+      
+  }, [setUserList]);
+
+    
+
+
+
 
   return (
     <DrawLayout
@@ -19,10 +66,19 @@ function DrawPage() {
       />}
       rightArea={
         <>
-          {/* <Instructions>
-            {getInstructions('user-list')}
-          </Instructions> */}
-          <UserList users={userList} />
+          {/* <!-- Ajouter le composant TestUserList ici --> */}
+          {/* <UserList users={[
+            {username: 'Spider-man'},
+            {username: 'toji'}
+          ]}/> */}
+          {/* <TestUserList /> */}
+          {/* <List bulleted>
+            <ListItem><UserList users={userList} /></ListItem>
+          </List> */
+          
+          <UserList users={userList} />}
+
+  
         </>
       }
       bottomArea={
@@ -33,12 +89,10 @@ function DrawPage() {
         </>
       }
     >
-      <DrawArea />
-      {/* <TestDrawArea /> */}
-      <Instructions className="max-w-xs">
+      {/* <Instructions>
         {getInstructions('draw-area')}
-      </Instructions>
-      
+      </Instructions> */}
+      <DrawArea/>
     </DrawLayout>
   )
 }
