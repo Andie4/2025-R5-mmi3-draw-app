@@ -1,25 +1,37 @@
-import { log } from "console";
-import  { useCallback } from "react";
+import { useRef, useState } from "react";
 
-type Props = {};
+export const DrawArea = () => {
+  const canvas = useRef<HTMLCanvasElement | null>(null);
+  const [drawing, setDrawing] = useState(false);
 
-export const DrawArea = ({} :Props) => {
+  const start = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const ctx = canvas.current!.getContext("2d")!;
+    ctx.beginPath(); 
+    ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY); 
+    setDrawing(true);
+    console.log("x",e.nativeEvent.offsetX,"y", e.nativeEvent.offsetY);
+  };
 
-    // Handle mouse down event
-  const onMouseDown = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
-    // canvas.drawing = true;
-    const canvas = event.currentTarget;
-    log(canvas);
-    console.log("Mouse down at:", event.clientX, event.clientY);
-    
-  
-  }, []);
+  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!drawing) return;
+    const ctx = canvas.current!.getContext("2d")!;
+    ctx.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY); 
+    ctx.stroke(); 
+    // console.log("x",e.nativeEvent.offsetX,"y", e.nativeEvent.offsetY);
+  };
+
+  const end = () => setDrawing(false);
+
   return (
-    <div>
-      <canvas onMouseDown={onMouseDown} className="canvas" style={{backgroundColor: "lightgrey", width:500, height:300}} id="canvas"></canvas>
-    </div>
+    <canvas
+      ref={canvas}
+      width={500}
+      height={300}
+      style={{ background: "lightgrey", border: "1px solid black" }}
+      onMouseDown={start}
+      onMouseMove={draw}
+      onMouseUp={end}
+      onMouseLeave={end}
+    />
   );
-}
-
-
-
+};
