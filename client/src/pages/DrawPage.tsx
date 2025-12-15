@@ -62,8 +62,7 @@ function DrawPage() {
   return (
     <DrawLayout
       topArea={<AppHeader 
-        onClickJoin={onClickJoin}
-        
+        onClickJoin={() => joinMyUser()}
       />}
       rightArea={
         <>
